@@ -2,40 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\User\LoginRequest;
+use App\Http\Requests\User\StoreUserRequest;
+use App\Services\UserService;
 
 class UserController extends Controller
 {
-    public function register(Request $request)
+    public function __construct(private UserService $userService)
     {
-        $data = $request->all();
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
-        return response()->json(['user' => $user, 'token' => $user->createToken('apiToken')->plainTextToken], 201);
+        $this->middleware('auth:sanctum')->only(['logout']);
     }
 
-    public function login(Request $request)
+    public function register(StoreUserRequest $request): \Illuminate\Http\JsonResponse
     {
-        $data = $request->all();
-        $user = User::where('email', $data['email'])->first();
-
-        if ($user && Hash::check($data['password'], $user->password)) {
-            $token = $user->createToken('apiToken')->plainTextToken;
-        } else {
-            return response()->json(['message' => 'Bad credentials'], 401);
-        }
-
-        return response()->json(['user' => $user, 'token' => $token], 201);
+        return $this->userService->register($request->all());
     }
 
-    public function logout(Request $request)
+    public function login(LoginRequest $request): \Illuminate\Http\JsonResponse
     {
-        $request->user()->tokens()->delete();
-        return ['message' => 'Logged out'];
+        return $this->userService->login($request->all());
+    }
+
+    public function logout(): \Illuminate\Http\JsonResponse
+    {
+        return $this->userService->logout();
     }
 }
