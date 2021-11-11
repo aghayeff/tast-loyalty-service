@@ -16,7 +16,7 @@ class UserTest extends TestCase
      *
      * @return void
      */
-    public function testLogin($email = 'admin@admin.com', $password = 'admin')
+    public function testLogin($email = 'admin@admin.com', $password = 'admin123456')
     {
         $response = $this->post('/api/user/login', ['email' => $email, 'password' => $password]);
         $response->assertSessionHasNoErrors();
