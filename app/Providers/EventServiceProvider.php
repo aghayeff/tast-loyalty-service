@@ -4,9 +4,12 @@ namespace App\Providers;
 
 use App\Events\AccountActivated;
 use App\Events\AccountDeactivated;
+use App\Events\LoyaltyPointsReceived;
 use App\Listeners\SendEmailAccountActivationNotification;
 use App\Listeners\SendEmailAccountDeactivationNotification;
+use App\Listeners\SendEmailLoyaltyPointsReceived;
 use App\Listeners\SendSmsAccountActivationNotification;
+use App\Listeners\SendSmsLoyaltyPointsReceived;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -30,6 +33,10 @@ class EventServiceProvider extends ServiceProvider
         AccountDeactivated::class => [
             SendEmailAccountDeactivationNotification::class,
             SendSmsAccountActivationNotification::class
+        ],
+        LoyaltyPointsReceived::class => [
+            SendEmailLoyaltyPointsReceived::class,
+            SendSmsLoyaltyPointsReceived::class
         ]
     ];
 
