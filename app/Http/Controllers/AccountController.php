@@ -2,65 +2,80 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Account\ActivateAccountRequest;
+use App\Http\Requests\Account\StoreAccountRequest;
 use App\Models\LoyaltyAccount;
-use Illuminate\Http\Request;
+use App\Services\AccountService;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+
 
 class AccountController extends Controller
 {
-    public function create(Request $request)
+    public function __construct(private AccountService $accountService)
     {
-        return LoyaltyAccount::create($request->all());
+
     }
 
-    public function activate($type, $id)
-    {
-        if (($type == 'phone' || $type == 'card' || $type == 'email') && $id != '') {
-            if ($account = LoyaltyAccount::where($type, '=', $id)->first()) {
-                if (!$account->active) {
-                    $account->active = true;
-                    $account->save();
-                    $account->notify('Account restored');
-                }
-            } else {
-                return response()->json(['message' => 'Account is not found'], 400);
-            }
-        } else {
-            throw new \InvalidArgumentException('Wrong parameters');
-        }
 
-        return response()->json(['success' => true]);
+    public function create(StoreAccountRequest $request)
+    {
+        return $this->accountService->create($request->all());
     }
 
-    public function deactivate($type, $id)
+
+    public function activate(ActivateAccountRequest $request): \Illuminate\Http\JsonResponse
     {
-        if (($type == 'phone' || $type == 'card' || $type == 'email') && $id != '') {
-            if ($account = LoyaltyAccount::where($type, '=', $id)->first()) {
-                if ($account->active) {
-                    $account->active = false;
-                    $account->save();
-                    $account->notify('Account banned');
-                }
-            } else {
-                return response()->json(['message' => 'Account is not found'], 400);
-            }
-        } else {
-            throw new \InvalidArgumentException('Wrong parameters');
+        $account = $this->accountService->getAccountByParams($request->all());
+
+        if (!$account) {
+            return response()->json(['message' => 'Account is not found'], 400);
         }
 
-        return response()->json(['success' => true]);
+        $this->accountService->activate($account);
+
+        return response()->json(['message' => 'Account is activated']);
     }
 
-    public function balance($type, $id)
-    {
-        if (($type == 'phone' || $type == 'card' || $type == 'email') && $id != '') {
-            if ($account = LoyaltyAccount::where($type, '=', $id)->first()) {
-                return response()->json(['balance' => $account->getBalance()], 400);
 
-            } else {
-                return response()->json(['message' => 'Account is not found'], 400);
-            }
-        } else {
-            throw new \InvalidArgumentException('Wrong parameters');
+    public function deactivate(ActivateAccountRequest $request): \Illuminate\Http\JsonResponse
+    {
+        $account = $this->accountService->getAccountByParams($request->all());
+
+        if (!$account) {
+            return response()->json(['message' => 'Account is not found'], 400);
         }
+
+        $this->accountService->deactivate($account);
+
+        return response()->json(['message' => 'Account is deactivated']);
+    }
+
+
+    public function balance($type, $value): \Illuminate\Http\JsonResponse
+    {
+        $params = [
+            'type' => $type,
+            'value' => $value
+        ];
+
+        $validated = Validator::make($params, [
+            'type' => ['required', 'string', Rule::in(LoyaltyAccount::$types)],
+            'value' => ['required', 'string']
+        ]);
+
+        if ($validated->fails()) {
+            return response()->json(['message' => 'Wrong parameters'], 422);
+        }
+
+        $account = $this->accountService->getAccountByParams($params);
+
+        if (!$account) {
+            return response()->json(['message' => 'Account is not found'], 400);
+        }
+
+        $balance = $this->accountService->getBalance($account->id);
+
+        return response()->json(['balance' => $balance]);
     }
 }

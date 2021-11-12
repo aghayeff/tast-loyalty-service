@@ -23,9 +23,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // account management
     Route::post('account/create', [AccountController::class, 'create']);
-    Route::post('account/activate/{type}/{id}', [AccountController::class, 'activate']);
-    Route::post('account/deactivate/{type}/{id}', [AccountController::class, 'deactivate']);
-    Route::get('account/balance/{type}/{id}', [AccountController::class, 'balance']);
+    Route::post('account/activate', [AccountController::class, 'activate']);
+    Route::post('account/deactivate', [AccountController::class, 'deactivate']);
+    Route::get('account/balance/{type}/{value}', [AccountController::class, 'balance']);
 
     // loyalty points management
     Route::post('loyaltyPoints/deposit', [LoyaltyPointsController::class, 'deposit']);
