@@ -15,16 +15,18 @@ class CreateLoyaltyPointsTransactionsTable extends Migration
     {
         Schema::create('loyalty_points_transaction', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('account_id');
+            $table->unsignedBigInteger('account_id');
             $table->float('points_amount');
             $table->float('payment_amount')->nullable();
             $table->string('payment_id')->nullable();
             $table->integer('payment_time')->nullable();
             $table->string('description');
             $table->integer('points_rule')->nullable();
-            $table->integer('canceled')->default(0);
+            $table->unsignedInteger('canceled')->default(0);
             $table->string('cancellation_reason')->nullable();
             $table->timestamps();
+
+            $table->foreign('account_id')->references('id')->on('loyalty_account')->onDelete('cascade');
         });
     }
 
