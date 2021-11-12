@@ -2,6 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\AccountActivated;
+use App\Events\AccountDeactivated;
+use App\Listeners\SendEmailAccountActivationNotification;
+use App\Listeners\SendEmailAccountDeactivationNotification;
+use App\Listeners\SendSmsAccountActivationNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -18,6 +23,14 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        AccountActivated::class => [
+            SendEmailAccountActivationNotification::class,
+            SendSmsAccountActivationNotification::class
+        ],
+        AccountDeactivated::class => [
+            SendEmailAccountDeactivationNotification::class,
+            SendSmsAccountActivationNotification::class
+        ]
     ];
 
     /**
