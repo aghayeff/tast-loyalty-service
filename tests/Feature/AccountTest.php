@@ -34,7 +34,7 @@ class AccountTest extends TestCase
         $response->assertSessionHasNoErrors();
     }
 
-    public function testActivate()
+    public function testActivation()
     {
         $this->authUser();
 
@@ -50,7 +50,7 @@ class AccountTest extends TestCase
         $response->assertSessionHasNoErrors();
     }
 
-    public function testDeActivate()
+    public function testDeactivation()
     {
         $this->authUser();
 
