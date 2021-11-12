@@ -22,4 +22,9 @@ class LoyaltyAccount extends Model
     public static array $types = [
         'phone', 'card', 'email'
     ];
+
+    public function transactions()
+    {
+        return $this->hasMany(LoyaltyPointsTransaction::class, 'account_id');
+    }
 }

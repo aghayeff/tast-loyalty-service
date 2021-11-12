@@ -17,4 +17,14 @@ class LoyaltyPointsTransaction extends Model
         'payment_amount',
         'payment_time',
     ];
+
+    public function account()
+    {
+        return $this->belongsTo(LoyaltyAccount::class, 'account_id');
+    }
+
+    public function pointRule()
+    {
+        return $this->belongsTo(LoyaltyPointsRule::class, 'points_rule');
+    }
 }
