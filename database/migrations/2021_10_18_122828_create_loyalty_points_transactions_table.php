@@ -22,7 +22,7 @@ class CreateLoyaltyPointsTransactionsTable extends Migration
             $table->integer('payment_time')->nullable();
             $table->string('description');
             $table->integer('points_rule')->nullable();
-            $table->boolean('canceled')->default(0);
+            $table->unsignedInteger('canceled')->default(0);
             $table->string('cancellation_reason')->nullable();
             $table->timestamps();
 
